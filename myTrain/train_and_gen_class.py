@@ -1,4 +1,4 @@
-from transformer import generate_text_simple
+from transformer import generate_text
 
 import os
 import numpy as np
@@ -45,7 +45,7 @@ def generate(model, idx, max_new_tokens, context_size, temperature=0.0, top_k=No
     return idx
 
 
-def train_model_simple(model, train_loader, val_loader, optimizer, device, num_epochs,
+def train_model(model, train_loader, val_loader, optimizer, device, num_epochs,
                        eval_freq, eval_iter, start_context, tokenizer):
     # 初始化列表以跟踪损失和已见的tokens
     train_losses, val_losses, track_tokens_seen = [], [], []
@@ -103,7 +103,7 @@ def generate_and_print_sample(model, tokenizer, device, start_context):
     context_size = model.pos_emb.weight.shape[0]
     encoded = text_to_token_ids(start_context, tokenizer).to(device)
     with torch.no_grad():
-        token_ids = generate_text_simple(
+        token_ids = generate_text(
             model=model, idx=encoded,
             max_new_tokens=50, context_size=context_size
         )
@@ -180,12 +180,18 @@ def load_weights_into_gpt(gpt, params):
 
 
 def text_to_token_ids(text, tokenizer):
-    encoded = tokenizer.encode(text, allowed_special={"_"})
+    # 如果没有提供分词器，使用默认的cl100k_base
+    if tokenizer is None:
+        tokenizer = tiktoken.get_encoding("cl100k_base")
+    encoded = tokenizer.encode(text, allowed_special="all")
     encoded_tensor = torch.tensor(encoded).unsqueeze(0)  # add batch dimension
     return encoded_tensor
 
 
 def token_ids_to_text(token_ids, tokenizer):
+    # 如果没有提供分词器，使用默认的cl100k_base
+    if tokenizer is None:
+        tokenizer = tiktoken.get_encoding("cl100k_base")
     flat = token_ids.squeeze(0)  # remove batch dimension
     return tokenizer.decode(flat.tolist())
 

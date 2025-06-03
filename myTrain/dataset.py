@@ -32,7 +32,7 @@ def create_dataloader(txt, batch_size=4, max_length=256,
     tokenizer = tiktoken.get_encoding("gpt2")
 
     # 创建数据集
-    dataset = GPTDatasetV1(txt, tokenizer, max_length, stride)
+    dataset = GPTDataset(txt, tokenizer, max_length, stride)
 
     # 创建数据加载器
     dataloader = DataLoader(

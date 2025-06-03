@@ -1,17 +1,11 @@
-# Copyright (c) Sebastian Raschka under Apache License 2.0 (see LICENSE.txt).
-# Source for "Build a Large Language Model From Scratch"
-#   - https://www.manning.com/books/build-a-large-language-model-from-scratch
-# Code: https://github.com/rasbt/LLMs-from-scratch
-
 import json
 import torch
 from torch.utils.data import Dataset, DataLoader
 import tiktoken
 from torch.nn.utils.rnn import pad_sequence
 
-from dataset import create_dataloader
 from transformer import GPTModel
-from train_and_gen_class import train_model_simple, calc_loss_batch
+from train_and_gen_class import train_model
 
 class JSONLDataset(Dataset):
     def __init__(self, file_path, tokenizer, max_length=256):
@@ -88,7 +82,7 @@ def main():
     optimizer = torch.optim.AdamW(model.parameters(), lr=3e-5)
 
     # 训练模型
-    train_model_simple(
+    train_model(
         model, train_loader, val_loader, optimizer, device,
         num_epochs=100, eval_freq=10, eval_iter=5,
         start_context="如何评价贴吧", tokenizer=tiktoken.get_encoding("gpt2")

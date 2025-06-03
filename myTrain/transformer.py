@@ -67,7 +67,7 @@ class GPTModel(nn.Module):
         return logits
 
 
-def generate_text_simple(model, idx, max_new_tokens, context_size):
+def generate_text(model, idx, max_new_tokens, context_size):
     # idx是当前上下文中索引的(B, T)数组
     for _ in range(max_new_tokens):
 
@@ -114,7 +114,9 @@ class TransformerBlock(nn.Module):
             d_out=cfg["emb_dim"],
             num_heads=cfg["n_heads"],
             dropout=cfg["drop_rate"],
-            qkv_bias=cfg["qkv_bias"])
+            qkv_bias=cfg["qkv_bias"],
+            context_length=cfg["context_length"]
+        )
         self.ff = FeedForward(cfg)
         self.norm1 = nn.LayerNorm(cfg["emb_dim"])
         self.norm2 = nn.LayerNorm(cfg["emb_dim"])
